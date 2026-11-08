@@ -1,0 +1,32 @@
+{
+  "name": "financial-ledger-service",
+  "version": "1.0.0",
+  "description": "Financial Ledger microservice with Double-Entry Bookkeeping, Saga orchestration and BullMQ queues",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "node ./node_modules/typescript/bin/tsc",
+    "test": "node ./node_modules/vitest/vitest.mjs run",
+    "test:watch": "node ./node_modules/vitest/vitest.mjs",
+    "test:coverage": "node ./node_modules/vitest/vitest.mjs run --coverage",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": [
+    "ledger",
+    "double-entry",
+    "saga",
+    "bullmq",
+    "clean-architecture",
+    "financial"
+  ],
+  "author": "Viktor Gabriel",
+  "license": "ISC",
+  "dependencies": {
+    "fastify": "^5.2.1",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.8",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.7"
+  }
+}
