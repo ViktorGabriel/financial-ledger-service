@@ -1,0 +1,79 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
+
+enum AccountStatus {
+  ACTIVE
+  FROZEN
+  CLOSED
+}
+
+enum EntryType {
+  DEBIT
+  CREDIT
+}
+
+enum TransactionStatus {
+  PENDING
+  POSTED
+  REJECTED
+  CANCELED
+}
+
+model Account {
+  id            String        @id @default(uuid()) @db.Uuid
+  accountNumber String        @unique @db.VarChar(64)
+  type          AccountType
+  currency      String        @db.Char(3)
+  status        AccountStatus @default(ACTIVE)
+  balance       BigInt        @default(0)
+  version       Int           @default(0)
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  entries       Entry[]
+
+  @@map("accounts")
+}
+
+model Transaction {
+  id             String            @id @default(uuid()) @db.Uuid
+  idempotencyKey String            @unique @map("idempotency_key") @db.VarChar(128)
+  description    String            @db.VarChar(255)
+  status         TransactionStatus @default(PENDING)
+  createdAt      DateTime          @default(now()) @map("created_at")
+  postedAt       DateTime?         @map("posted_at")
+
+  entries        Entry[]
+
+  @@map("transactions")
+}
+
+model Entry {
+  id            String      @id @default(uuid()) @db.Uuid
+  transactionId String      @map("transaction_id") @db.Uuid
+  accountId     String      @map("account_id") @db.Uuid
+  type          EntryType
+  amount        BigInt
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  account       Account     @relation(fields: [accountId], references: [id], onDelete: Restrict)
+
+  @@index([transactionId])
+  @@index([accountId])
+  @@map("entries")
+}
