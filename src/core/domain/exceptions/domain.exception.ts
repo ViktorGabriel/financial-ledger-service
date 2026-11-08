@@ -37,3 +37,33 @@ export class EmptyTransactionException extends DomainException {
     super("A transaction cannot be created without entries.");
   }
 }
+
+export class InsufficientFundsException extends DomainException {
+  constructor(accountId: string, currentBalance: bigint, requiredAmount: bigint) {
+    super(
+      `Account ${accountId} has insufficient funds. Current balance: ${currentBalance.toString()}, required: ${requiredAmount.toString()}`
+    );
+  }
+}
+
+export class AccountNotFoundException extends DomainException {
+  constructor(accountId: string) {
+    super(`Account not found with ID: ${accountId}`);
+  }
+}
+
+export class SameAccountTransferException extends DomainException {
+  constructor(accountId: string) {
+    super(`Cannot transfer funds to the same account: ${accountId}`);
+  }
+}
+
+export class ConcurrencyConflictException extends DomainException {
+  constructor(accountId: string, expectedVersion: number, actualVersion: number) {
+    super(
+      `Concurrency conflict on account ${accountId}. Expected version: ${expectedVersion}, actual version: ${actualVersion}. Retry the operation.`
+    );
+  }
+}
+
+

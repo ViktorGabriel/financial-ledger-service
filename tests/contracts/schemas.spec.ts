@@ -1,8 +1,39 @@
 import { describe, it, expect } from "vitest";
 import { CreateAccountSchema } from "../../src/contracts/schemas/account.schema.js";
 import { CreateTransactionSchema } from "../../src/contracts/schemas/transaction.schema.js";
+import { TransferFundsSchema } from "../../src/contracts/schemas/transfer-funds.schema.js";
 
 describe("Contract Zod Schemas", () => {
+  describe("TransferFundsSchema", () => {
+    it("should accept valid transfer input and transform amount to bigint", () => {
+      const valid = {
+        idempotencyKey: "transfer-1234",
+        sourceAccountId: "11111111-1111-4111-8111-111111111111",
+        destinationAccountId: "22222222-2222-4222-8222-222222222222",
+        amount: "5000",
+        description: "Valid transfer",
+      };
+
+      const result = TransferFundsSchema.safeParse(valid);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.amount).toBe(5000n);
+      }
+    });
+
+    it("should reject non-uuid account IDs", () => {
+      const invalid = {
+        idempotencyKey: "transfer-1234",
+        sourceAccountId: "invalid-uuid",
+        destinationAccountId: "22222222-2222-4222-8222-222222222222",
+        amount: 5000,
+        description: "Invalid UUID",
+      };
+
+      const result = TransferFundsSchema.safeParse(invalid);
+      expect(result.success).toBe(false);
+    });
+  });
   describe("CreateAccountSchema", () => {
     it("should accept valid account input", () => {
       const valid = {

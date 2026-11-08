@@ -60,4 +60,4 @@ export const CreateTransactionSchema = z
   });
 
 export type CreateTransactionInput = z.infer<typeof CreateTransactionSchema>;
-export type TransactionStatus = z.infer<typeof TransactionStatusEnum>;
+export type TransactionStatusSchema = z.infer<typeof TransactionStatusEnum>;

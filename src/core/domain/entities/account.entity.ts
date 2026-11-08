@@ -11,6 +11,8 @@ export interface AccountProps {
   currency: string;
   status?: AccountStatus;
   balance?: bigint;
+  version?: number;
+  baseVersion?: number;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -22,6 +24,8 @@ export class Account {
   readonly currency: string;
   private _status: AccountStatus;
   private _balance: bigint;
+  private _version: number;
+  private _baseVersion: number;
   readonly createdAt: Date;
   private _updatedAt: Date;
 
@@ -32,6 +36,8 @@ export class Account {
     this.currency = props.currency.toUpperCase();
     this._status = props.status ?? "ACTIVE";
     this._balance = props.balance ?? 0n;
+    this._version = props.version ?? 0;
+    this._baseVersion = props.baseVersion ?? this._version;
     this.createdAt = props.createdAt ?? new Date();
     this._updatedAt = props.updatedAt ?? this.createdAt;
   }
@@ -48,12 +54,39 @@ export class Account {
     return this._balance;
   }
 
+  public get version(): number {
+    return this._version;
+  }
+
+  public get baseVersion(): number {
+    return this._baseVersion;
+  }
+
   public get updatedAt(): Date {
     return this._updatedAt;
   }
 
   public isActive(): boolean {
     return this._status === "ACTIVE";
+  }
+
+  public hasSufficientFunds(amount: bigint): boolean {
+    return this._balance >= amount;
+  }
+
+  public clone(): Account {
+    return new Account({
+      id: this.id,
+      accountNumber: this.accountNumber,
+      type: this.type,
+      currency: this.currency,
+      status: this._status,
+      balance: this._balance,
+      version: this._version,
+      baseVersion: this._version,
+      createdAt: new Date(this.createdAt.getTime()),
+      updatedAt: new Date(this._updatedAt.getTime()),
+    });
   }
 
   public freeze(): void {
@@ -93,6 +126,7 @@ export class Account {
         : this._balance + entry.amount;
     }
 
+    this._version += 1;
     this._updatedAt = new Date();
   }
 }
